@@ -15,10 +15,9 @@ public function up(): void
         $table->id();
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
         $table->foreignId('book_id')->constrained()->onDelete('cascade');
-        $table->dateTime('borrowed_at');
-        $table->dateTime('due_date');
-        $table->dateTime('returned_at')->nullable();
-        $table->enum('status', ['dipinjam', 'dikembalikan', 'terlambat']);
+        $table->date('borrowed_at');
+        $table->date('due_date');
+        $table->enum('status', ['borrowed', 'returned', 'overdue'])->default('borrowed');
         $table->timestamps();
     });
 }
