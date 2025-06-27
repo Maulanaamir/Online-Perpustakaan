@@ -2,17 +2,28 @@ import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import axios from "../services/api"; // pastikan file axios setup sudah meng-handle token
 
 export default function BookCard({ book }) {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleBorrow = () => {
+  const handleBorrow = async () => {
     if (!user) {
       navigate("/login");
     } else {
-      // Logika meminjam akan ditambahkan nanti
-      alert("Berhasil meminjam buku!");
+      try {
+        const response = await axios.post("/borrow", {
+          book_id: book.id,
+        });
+        alert(response.data.message); // "Buku berhasil dipinjam"
+      } catch (error) {
+        console.error(error);
+        alert(
+          error?.response?.data?.message ||
+            "Gagal meminjam buku. Mungkin sudah dipinjam?"
+        );
+      }
     }
   };
 

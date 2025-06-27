@@ -6,7 +6,7 @@ export default function BorrowedBooks() {
   const [books, setBooks] = useState([]);
 
   useEffect(() => {
-    axios.get("/borrowings/my").then((res) => {
+    axios.get("/borrowings").then((res) => {
       setBooks(res.data);
     });
   }, []);

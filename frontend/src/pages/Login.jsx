@@ -11,9 +11,10 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const userData = await login(credentials); // login akan return user
-      console.log("User logged in:", userData);
-      if (userData.role && userData.role.toLowerCase() === "admin") {
+      const userData = await login(credentials);
+      console.log("🧠 userData setelah login:", userData); // 👈 Tambahkan ini
+
+      if (userData?.role && userData.role.toLowerCase() === "admin") {
         navigate("/admin");
       } else {
         navigate("/");

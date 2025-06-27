@@ -5,7 +5,7 @@ export default function Users() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    axios.get("/admin/users").then((res) => setUsers(res.data));
+    axios.get("/users").then((res) => setUsers(res.data));
   }, []);
 
   return (
