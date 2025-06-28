@@ -14,9 +14,9 @@ class Book extends Model
         'author',
         'category_id',
         'file_path',
+        'cover_path', 
     ];
 
-    // Relasi ke kategori (Many to One)
     public function category()
     {
         return $this->belongsTo(Category::class);

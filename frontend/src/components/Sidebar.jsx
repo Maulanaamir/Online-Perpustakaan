@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  IconArrowLeft,
-  IconBrandTabler,
   IconSettings,
   IconUserBolt,
   IconBook,
@@ -43,17 +41,19 @@ export default function Sidebar() {
       <div
         className={`transition-all duration-300 ${
           open ? "w-64" : "w-16"
-        } bg-gray-900 text-white flex flex-col`}
+        } bg-white text-gray-900 flex flex-col border-r border-gray-200 shadow-sm`}
       >
+        {/* Header */}
         <div className="flex items-center justify-between p-4">
           <span className="text-lg font-semibold">
             {open ? "Admin Panel" : "AP"}
           </span>
-          <button onClick={() => setOpen(!open)} className="text-white">
+          <button onClick={() => setOpen(!open)} className="text-gray-600">
             {open ? <IconChevronLeft size={20} /> : <IconChevronRight size={20} />}
           </button>
         </div>
 
+        {/* Menu */}
         <div className="flex flex-col gap-1 px-2 flex-1">
           {links.map((link, idx) => {
             if (link.label === "Logout") {
@@ -63,7 +63,7 @@ export default function Sidebar() {
                   onClick={handleLogout}
                   whileTap={{ scale: 0.97 }}
                   whileHover={{ scale: 1.03 }}
-                  className="flex items-center gap-3 px-3 py-2 rounded transition w-full text-left bg-red-600 hover:bg-red-700"
+                  className="flex items-center gap-3 px-3 py-2 rounded transition w-full text-left bg-gray-100 text-red-600 hover:bg-gray-200"
                 >
                   {link.icon}
                   {open && <span>Logout</span>}
@@ -77,8 +77,8 @@ export default function Sidebar() {
                 key={idx}
                 className={`flex items-center gap-3 px-3 py-2 rounded transition ${
                   location.pathname === link.href
-                    ? "bg-gray-800"
-                    : "hover:bg-gray-700"
+                    ? "bg-gray-200"
+                    : "hover:bg-gray-100"
                 }`}
               >
                 {link.icon}

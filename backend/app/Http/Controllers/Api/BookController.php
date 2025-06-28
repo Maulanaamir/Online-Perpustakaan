@@ -14,7 +14,6 @@ class BookController extends Controller
     public function index()
     {
         $books = Book::with('category')->get();
-
         return response()->json($books);
     }
 
@@ -22,7 +21,6 @@ class BookController extends Controller
     public function show($id)
     {
         $book = Book::with('category')->findOrFail($id);
-
         return response()->json($book);
     }
 
@@ -34,15 +32,25 @@ class BookController extends Controller
             'author'      => 'required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
             'file'        => 'required|mimes:pdf,epub|max:10240',
+            'cover'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
+        // Simpan file buku
         $filePath = $request->file('file')->store('books', 'public');
 
+        // Simpan cover jika ada
+        $coverPath = null;
+        if ($request->hasFile('cover')) {
+            $coverPath = $request->file('cover')->store('covers', 'public');
+        }
+
+        // Buat data buku
         $book = Book::create([
             'title'       => $validated['title'],
             'author'      => $validated['author'],
             'category_id' => $validated['category_id'] ?? null,
             'file_path'   => $filePath,
+            'cover_path'  => $coverPath,
         ]);
 
         return response()->json(['message' => 'Buku berhasil ditambahkan', 'book' => $book], 201);
@@ -58,12 +66,21 @@ class BookController extends Controller
             'author'      => 'sometimes|required|string|max:255',
             'category_id' => 'nullable|exists:categories,id',
             'file'        => 'nullable|mimes:pdf,epub|max:10240',
+            'cover'       => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        // Update file jika diunggah ulang
+        // Update file PDF jika diupload ulang
         if ($request->hasFile('file')) {
             Storage::disk('public')->delete($book->file_path);
             $book->file_path = $request->file('file')->store('books', 'public');
+        }
+
+        // Update cover jika diupload ulang
+        if ($request->hasFile('cover')) {
+            if ($book->cover_path) {
+                Storage::disk('public')->delete($book->cover_path);
+            }
+            $book->cover_path = $request->file('cover')->store('covers', 'public');
         }
 
         $book->update([
@@ -81,6 +98,10 @@ class BookController extends Controller
         $book = Book::findOrFail($id);
 
         Storage::disk('public')->delete($book->file_path);
+        if ($book->cover_path) {
+            Storage::disk('public')->delete($book->cover_path);
+        }
+
         $book->delete();
 
         return response()->json(['message' => 'Buku berhasil dihapus']);

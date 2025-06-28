@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import Home from "../pages/Home";
 import Login from "../pages/Login";
+import Register from "../pages/Register";
 import BorrowedBooks from "../pages/BorrowedBooks";
 import AdminDashboard from "../pages/AdminDashboard";
 import Books from "../pages/admin/Books";
@@ -24,7 +25,23 @@ export default function Router() {
         <Route path="/" element={<Home />} />
         <Route
           path="/login"
-          element={!user ? <Login /> : user.role === "admin" ? <Navigate to="/admin" /> : <Navigate to="/" />}
+          element={
+            !user
+              ? <Login />
+              : user.role === "admin"
+                ? <Navigate to="/admin" />
+                : <Navigate to="/" />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            !user
+              ? <Register />
+              : user.role === "admin"
+                ? <Navigate to="/admin" />
+                : <Navigate to="/" />
+          }
         />
       </Route>
 
@@ -54,7 +71,7 @@ export default function Router() {
         <Route path="users" element={<Users />} />
       </Route>
 
-      {/* Fallback Route */}
+      {/* Fallback */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
