@@ -12,13 +12,13 @@ class Book extends Model
     protected $fillable = [
         'title',
         'author',
-        'category_id',
         'file_path',
-        'cover_path', 
+        'cover_path',
     ];
 
-    public function category()
+    // Relasi ke banyak kategori
+    public function categories()
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Category::class, 'book_category');
     }
 }

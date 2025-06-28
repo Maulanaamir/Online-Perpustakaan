@@ -1,4 +1,4 @@
-// src/context/AuthContext.jsx
+
 
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "../services/api";
@@ -13,7 +13,7 @@ export function AuthProvider({ children }) {
     const data = res.data;
     localStorage.setItem("token", data.token);
     setUser(data.user);
-    return data.user; // penting untuk redirect berdasarkan role
+    return data.user;
   };
 
   const logout = () => {
@@ -29,9 +29,9 @@ export function AuthProvider({ children }) {
       const res = await axios.get("/user", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("✅ /user response:", res.data); // debug cek role
+      console.log("✅ /user response:", res.data); 
 
-      // Normalize user object to have id, name, email, role explicitly
+      
       const u = res.data;
       const normalizedUser = {
         id: u.id,

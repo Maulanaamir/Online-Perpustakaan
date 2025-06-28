@@ -13,9 +13,9 @@ class Category extends Model
         'name',
     ];
 
-    // Relasi ke buku-buku (One to Many)
+    // Relasi ke banyak buku (Many to Many)
     public function books()
     {
-        return $this->hasMany(Book::class);
+        return $this->belongsToMany(Book::class, 'book_category');
     }
 }

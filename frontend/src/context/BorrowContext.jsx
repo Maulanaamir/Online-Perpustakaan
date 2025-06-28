@@ -8,14 +8,24 @@ const BorrowContext = createContext();
 export function BorrowProvider({ children }) {
   const { user } = useAuth();
   const [borrowedIds, setBorrowedIds] = useState([]);
+  const [loading, setLoading] = useState(false); 
 
   const fetchBorrowed = async () => {
-    if (!user) return;
+    if (!user) {
+      setBorrowedIds([]); // Reset saat logout
+      return;
+    }
+
     try {
+      setLoading(true);
       const res = await axios.get("/borrowings");
-      setBorrowedIds(res.data.map((b) => b.book_id));
+      const ids = res.data.map((b) => b.book_id); 
+      setBorrowedIds(ids);
     } catch (err) {
       console.error("❌ Gagal fetch borrowings", err);
+      setBorrowedIds([]); // fallback jika error
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -24,7 +34,13 @@ export function BorrowProvider({ children }) {
   }, [user]);
 
   return (
-    <BorrowContext.Provider value={{ borrowedIds, fetchBorrowed }}>
+    <BorrowContext.Provider
+      value={{
+        borrowedIds,
+        refreshBorrowed: fetchBorrowed, 
+        loadingBorrowed: loading,
+      }}
+    >
       {children}
     </BorrowContext.Provider>
   );

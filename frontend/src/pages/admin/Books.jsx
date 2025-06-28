@@ -1,6 +1,10 @@
 import React, { useEffect, useState, Fragment } from "react";
 import axios from "../../services/api";
 import { Dialog, Transition } from "@headlessui/react";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
+
+const animatedComponents = makeAnimated();
 
 export default function Books() {
   const [books, setBooks] = useState([]);
@@ -9,7 +13,7 @@ export default function Books() {
   const [form, setForm] = useState({
     title: "",
     author: "",
-    category_id: "",
+    categories: [],
     file: null,
     cover: null,
   });
@@ -35,20 +39,32 @@ export default function Books() {
       setForm({
         title: book.title,
         author: book.author,
-        category_id: book.category_id || "",
+        categories: book.categories?.map((c) => c.id.toString()) || [],
         file: null,
         cover: null,
       });
     } else {
       setEditingId(null);
-      setForm({ title: "", author: "", category_id: "", file: null, cover: null });
+      setForm({
+        title: "",
+        author: "",
+        categories: [],
+        file: null,
+        cover: null,
+      });
     }
   };
 
   const closeModal = () => {
     setIsOpen(false);
     setEditingId(null);
-    setForm({ title: "", author: "", category_id: "", file: null, cover: null });
+    setForm({
+      title: "",
+      author: "",
+      categories: [],
+      file: null,
+      cover: null,
+    });
   };
 
   const handleChange = (e) => {
@@ -62,10 +78,11 @@ export default function Books() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const formData = new FormData();
     formData.append("title", form.title);
     formData.append("author", form.author);
-    formData.append("category_id", form.category_id);
+    form.categories.forEach((id) => formData.append("categories[]", id));
     if (form.file) formData.append("file", form.file);
     if (form.cover) formData.append("cover", form.cover);
 
@@ -129,7 +146,11 @@ export default function Books() {
               </td>
               <td className="p-3 border">{b.title}</td>
               <td className="p-3 border">{b.author}</td>
-              <td className="p-3 border">{b.category?.name || "-"}</td>
+              <td className="p-3 border text-sm text-gray-700">
+                {b.categories?.length > 0
+                  ? b.categories.map((cat) => cat.name).join(", ")
+                  : "-"}
+              </td>
               <td className="p-3 border text-center space-x-2">
                 <button
                   onClick={() => openModal(b)}
@@ -186,7 +207,6 @@ export default function Books() {
                       <input
                         type="text"
                         name="title"
-                        placeholder="Masukkan judul..."
                         className="w-full border px-3 py-2 rounded"
                         value={form.title}
                         onChange={handleChange}
@@ -198,7 +218,6 @@ export default function Books() {
                       <input
                         type="text"
                         name="author"
-                        placeholder="Masukkan nama penulis..."
                         className="w-full border px-3 py-2 rounded"
                         value={form.author}
                         onChange={handleChange}
@@ -207,23 +226,34 @@ export default function Books() {
                     </div>
                     <div>
                       <label className="block font-medium mb-1">Kategori</label>
-                      <select
-                        name="category_id"
-                        className="w-full border px-3 py-2 rounded"
-                        value={form.category_id}
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="">-- Pilih Kategori --</option>
-                        {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.name}
-                          </option>
-                        ))}
-                      </select>
+                      <Select
+                        isMulti
+                        components={animatedComponents}
+                        options={categories.map((cat) => ({
+                          value: cat.id.toString(),
+                          label: cat.name,
+                        }))}
+                        value={categories
+                          .filter((cat) =>
+                            form.categories.includes(cat.id.toString())
+                          )
+                          .map((cat) => ({
+                            value: cat.id.toString(),
+                            label: cat.name,
+                          }))}
+                        onChange={(selected) =>
+                          setForm({
+                            ...form,
+                            categories: selected.map((s) => s.value),
+                          })
+                        }
+                        className="text-sm"
+                        classNamePrefix="react-select"
+                        placeholder="Pilih kategori..."
+                      />
                     </div>
                     <div>
-                      <label className="block font-medium mb-1">File Buku (PDF/EPUB)</label>
+                      <label className="block font-medium mb-1">File Buku</label>
                       <input
                         type="file"
                         name="file"
@@ -234,7 +264,7 @@ export default function Books() {
                       />
                     </div>
                     <div>
-                      <label className="block font-medium mb-1">Cover Buku (JPG/PNG)</label>
+                      <label className="block font-medium mb-1">Cover Buku</label>
                       <input
                         type="file"
                         name="cover"

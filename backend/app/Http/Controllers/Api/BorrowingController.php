@@ -14,7 +14,7 @@ class BorrowingController extends Controller
     public function index()
     {
         $borrowings = Borrowing::with([
-            'book.category', // relasi ke kategori buku
+            'book.categories', // relasi ke kategori buku
         ])
         ->where('user_id', auth()->id()) // hanya data milik user login
         ->latest()
@@ -29,6 +29,18 @@ class BorrowingController extends Controller
         $validated = $request->validate([
             'book_id' => 'required|exists:books,id'
         ]);
+
+        // Cegah peminjaman ulang jika buku masih dipinjam
+        $alreadyBorrowed = Borrowing::where('user_id', auth()->id())
+            ->where('book_id', $validated['book_id'])
+            ->where('status', 'borrowed')
+            ->exists();
+
+        if ($alreadyBorrowed) {
+            return response()->json([
+                'message' => 'Kamu sudah meminjam buku ini dan belum mengembalikannya.',
+            ], 422);
+        }
 
         $now = Carbon::now();
         $due = $now->copy()->addDays(7); // durasi peminjaman 7 hari
