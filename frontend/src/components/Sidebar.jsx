@@ -12,6 +12,7 @@ import {
   IconChevronRight,
 } from "@tabler/icons-react";
 import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 export default function Sidebar() {
   const location = useLocation();
@@ -32,6 +33,18 @@ export default function Sidebar() {
     const confirmLogout = window.confirm("Yakin ingin logout?");
     if (confirmLogout) {
       logout();
+      toast.success("👋 Kamu berhasil logout.", {
+        iconTheme: {
+          primary: "#f43f5e",
+          secondary: "#fff",
+        },
+        style: {
+          borderRadius: "10px",
+          background: "#fff",
+          color: "#111",
+          fontWeight: "bold",
+        },
+      });
       navigate("/");
     }
   };

@@ -13,24 +13,23 @@ export default function BookCard({ book }) {
   const [loading, setLoading] = useState(false);
   const hasBorrowed = borrowedIds.includes(book.id);
 
-const handleBorrow = async () => {
-  if (!user) return navigate("/login");
-  if (hasBorrowed || loading) return;
+  const handleBorrow = async () => {
+    if (!user) return navigate("/login");
+    if (hasBorrowed || loading) return;
 
-  try {
-    setLoading(true);
-    const res = await axios.post("/borrow", { book_id: book.id });
+    try {
+      setLoading(true);
+      const res = await axios.post("/borrow", { book_id: book.id });
 
-    await refreshBorrowed(); // TUNGGU SELESAI sebelum alert
-    alert(res.data.message || "Buku berhasil dipinjam");
-  } catch (err) {
-    console.error(err);
-    alert(err.response?.data?.message || "Gagal meminjam buku.");
-  } finally {
-    setLoading(false);
-  }
-};
-
+      await refreshBorrowed();
+      alert(res.data.message || "Buku berhasil dipinjam");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || "Gagal meminjam buku.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fileUrl =
     axios.defaults.baseURL.replace("/api", "") + "/storage/" + book.file_path;
@@ -44,7 +43,7 @@ const handleBorrow = async () => {
       whileHover={{ scale: 1.02 }}
       className="bg-white rounded-lg p-3 w-[200px] shadow hover:shadow-lg transition space-y-2"
     >
-      {/* Cover Buku dengan Hover Button */}
+      
       <div className="relative group w-full aspect-[2/3] overflow-hidden rounded border">
         {coverUrl ? (
           <img

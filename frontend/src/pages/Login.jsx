@@ -7,9 +7,13 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false); // ✅ state loading
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setLoading(true); // ✅ mulai loading
+
     try {
       const userData = await login(credentials);
       console.log("🧠 userData setelah login:", userData);
@@ -21,6 +25,8 @@ export default function Login() {
       }
     } catch {
       setError("Login gagal. Cek email/password.");
+    } finally {
+      setLoading(false); // ✅ stop loading
     }
   };
 
@@ -51,9 +57,21 @@ export default function Login() {
         />
         <button
           type="submit"
-          className="w-full bg-black text-white py-2 rounded hover:bg-gray-800 transition"
+          disabled={loading}
+          className={`w-full py-2 rounded transition flex items-center justify-center gap-2 ${
+            loading
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-black hover:bg-gray-800 text-white"
+          }`}
         >
-          Login
+          {loading ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              Logging in...
+            </>
+          ) : (
+            "Login"
+          )}
         </button>
       </form>
 

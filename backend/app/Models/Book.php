@@ -21,4 +21,10 @@ class Book extends Model
     {
         return $this->belongsToMany(Category::class, 'book_category');
     }
+
+    // Relasi ke semua peminjaman buku ini
+    public function borrowings()
+    {
+        return $this->hasMany(Borrowing::class);
+    }
 }

@@ -1,4 +1,3 @@
-// src/context/BorrowContext.js
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "../services/api";
 import { useAuth } from "./AuthContext";
@@ -8,7 +7,7 @@ const BorrowContext = createContext();
 export function BorrowProvider({ children }) {
   const { user } = useAuth();
   const [borrowedIds, setBorrowedIds] = useState([]);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const fetchBorrowed = async () => {
     if (!user) {
@@ -37,7 +36,8 @@ export function BorrowProvider({ children }) {
     <BorrowContext.Provider
       value={{
         borrowedIds,
-        refreshBorrowed: fetchBorrowed, 
+        setBorrowedIds, 
+        refreshBorrowed: fetchBorrowed,
         loadingBorrowed: loading,
       }}
     >

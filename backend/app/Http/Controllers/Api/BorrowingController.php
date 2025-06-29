@@ -16,11 +16,11 @@ class BorrowingController extends Controller
         $borrowings = Borrowing::with([
             'book.categories', // relasi ke kategori buku
         ])
-        ->where('user_id', auth()->id()) // hanya data milik user login
+        ->where('user_id', auth()->id())
         ->latest()
         ->get();
 
-        return response()->json($borrowings);
+        return response()->json($borrowings, 200);
     }
 
     // Proses meminjam buku
@@ -56,7 +56,7 @@ class BorrowingController extends Controller
         return response()->json([
             'message'    => 'Buku berhasil dipinjam',
             'borrowing'  => $borrowing,
-        ]);
+        ], 200); 
     }
 
     // Proses pengembalian buku
@@ -73,6 +73,6 @@ class BorrowingController extends Controller
 
         return response()->json([
             'message' => 'Buku berhasil dikembalikan',
-        ]);
+        ], 200); 
     }
 }

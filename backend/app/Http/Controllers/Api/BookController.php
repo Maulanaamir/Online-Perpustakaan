@@ -11,10 +11,16 @@ use App\Models\Category;
 class BookController extends Controller
 {
     // 📘 List semua buku (dengan semua kategori)
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::with('categories')->get(); // Ubah relasi jadi plural
-        return response()->json($books);
+        $query = Book::with('categories');
+
+        // Jika ada query popular=1, urutkan berdasarkan jumlah peminjaman terbanyak
+        if ($request->has('popular') && $request->popular == 1) {
+            $query->withCount('borrowings')->orderByDesc('borrowings_count');
+        }
+
+        return response()->json($query->get());
     }
 
     // 📘 Lihat satu buku
@@ -50,10 +56,12 @@ class BookController extends Controller
             'cover_path' => $coverPath,
         ]);
 
-        // Tambahkan kategori (attach ke pivot)
         $book->categories()->attach($validated['categories']);
 
-        return response()->json(['message' => 'Buku berhasil ditambahkan', 'book' => $book->load('categories')], 201);
+        return response()->json([
+            'message' => 'Buku berhasil ditambahkan',
+            'book'    => $book->load('categories')
+        ], 201);
     }
 
     // ✏️ Update buku
@@ -87,12 +95,14 @@ class BookController extends Controller
             'author' => $validated['author'] ?? $book->author,
         ]);
 
-        // Sinkronisasi kategori (optional, hanya jika dikirim)
         if (isset($validated['categories'])) {
             $book->categories()->sync($validated['categories']);
         }
 
-        return response()->json(['message' => 'Buku berhasil diperbarui', 'book' => $book->load('categories')]);
+        return response()->json([
+            'message' => 'Buku berhasil diperbarui',
+            'book'    => $book->load('categories')
+        ]);
     }
 
     // ❌ Hapus buku
@@ -100,10 +110,8 @@ class BookController extends Controller
     {
         $book = Book::findOrFail($id);
 
-        // Hapus relasi kategori
         $book->categories()->detach();
 
-        // Hapus file & cover
         Storage::disk('public')->delete($book->file_path);
         if ($book->cover_path) {
             Storage::disk('public')->delete($book->cover_path);
