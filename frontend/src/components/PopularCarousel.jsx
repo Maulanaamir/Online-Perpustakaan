@@ -8,6 +8,7 @@ import axios from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useBorrow } from "../context/BorrowContext";
+import { BookOpenIcon, ArrowDownTrayIcon } from "@heroicons/react/24/solid";
 
 export default function PopularCarousel() {
   const [books, setBooks] = useState([]);
@@ -27,36 +28,36 @@ export default function PopularCarousel() {
     fetchPopularBooks();
   }, []);
 
- const handleAction = async (book) => {
-  if (!user) return navigate("/login");
+  const handleAction = async (book) => {
+    if (!user) return navigate("/login");
 
-  const hasBorrowed = borrowedIds.includes(book.id);
-  if (hasBorrowed) {
-    const fileUrl =
-      axios.defaults.baseURL.replace("/api", "") + "/storage/" + book.file_path;
-    window.open(fileUrl, "_blank");
-  } else {
-    try {
-      await axios.post("/borrow", { book_id: book.id });
-      alert("Buku berhasil dipinjam");
-
-      // refresh data, tapi jangan bikin error kalau gagal
+    const hasBorrowed = borrowedIds.includes(book.id);
+    if (hasBorrowed) {
+      const fileUrl =
+        axios.defaults.baseURL.replace("/api", "") +
+        "/storage/" +
+        book.file_path;
+      window.open(fileUrl, "_blank");
+    } else {
       try {
-        await fetchBorrowed();
-      } catch (e) {
-        console.warn("Gagal refresh data pinjaman:", e);
-      }
-    } catch (err) {
-      console.error("Gagal meminjam buku", err);
-      alert(err.response?.data?.message || "Gagal meminjam buku.");
-    }
-  }
-};
+        await axios.post("/borrow", { book_id: book.id });
+        alert("Buku berhasil dipinjam");
 
+        // refresh data, tapi jangan bikin error kalau gagal
+        try {
+          await fetchBorrowed();
+        } catch (e) {
+          console.warn("Gagal refresh data pinjaman:", e);
+        }
+      } catch (err) {
+        console.error("Gagal meminjam buku", err);
+        alert(err.response?.data?.message || "Gagal meminjam buku.");
+      }
+    }
+  };
 
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-semibold text-gray-700 mb-3">📚 Buku Terpopuler</h2>
       <Swiper
         modules={[Navigation, Autoplay]}
         navigation
@@ -73,7 +74,9 @@ export default function PopularCarousel() {
               <div className="relative h-[400px] md:h-[450px] bg-gradient-to-r from-indigo-900 to-purple-800 text-white rounded-xl overflow-hidden shadow-lg flex items-center p-6">
                 <img
                   src={
-                    axios.defaults.baseURL.replace("/api", "") + "/storage/" + book.cover_path
+                    axios.defaults.baseURL.replace("/api", "") +
+                    "/storage/" +
+                    book.cover_path
                   }
                   alt={book.title}
                   className="h-full rounded-md object-cover shadow-md"
@@ -99,9 +102,19 @@ export default function PopularCarousel() {
                       hasBorrowed
                         ? "bg-white text-indigo-700 hover:bg-indigo-100"
                         : "bg-yellow-500 text-white hover:bg-yellow-600"
-                    } font-bold px-4 py-2 rounded transition`}
+                    } font-bold px-4 py-2 rounded transition flex items-center gap-2`}
                   >
-                    {hasBorrowed ? "📖 Read Now" : "📥 Pinjam"}
+                    {hasBorrowed ? (
+                      <>
+                        <BookOpenIcon className="w-5 h-5" />
+                        Read Now
+                      </>
+                    ) : (
+                      <>
+                        <ArrowDownTrayIcon className="w-5 h-5" />
+                        Pinjam
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
