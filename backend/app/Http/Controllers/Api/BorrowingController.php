@@ -10,17 +10,28 @@ use Illuminate\Support\Carbon;
 
 class BorrowingController extends Controller
 {
-    // Menampilkan semua buku yang dipinjam oleh user yang sedang login
+    // Menampilkan buku yang sedang dipinjam (belum dikembalikan)
     public function index()
     {
-        $borrowings = Borrowing::with([
-            'book.categories', // relasi ke kategori buku
-        ])
-        ->where('user_id', auth()->id())
-        ->latest()
-        ->get();
+        $borrowings = Borrowing::with(['book.categories'])
+            ->where('user_id', auth()->id())
+            ->where('status', 'borrowed') // hanya yang belum dikembalikan
+            ->latest()
+            ->get();
 
         return response()->json($borrowings, 200);
+    }
+
+    // Menampilkan riwayat peminjaman yang sudah dikembalikan
+    public function history()
+    {
+        $history = Borrowing::with(['book.categories'])
+            ->where('user_id', auth()->id())
+            ->where('status', 'returned') // hanya yang sudah dikembalikan
+            ->latest()
+            ->get();
+
+        return response()->json($history, 200);
     }
 
     // Proses meminjam buku
@@ -30,7 +41,6 @@ class BorrowingController extends Controller
             'book_id' => 'required|exists:books,id'
         ]);
 
-        // Cegah peminjaman ulang jika buku masih dipinjam
         $alreadyBorrowed = Borrowing::where('user_id', auth()->id())
             ->where('book_id', $validated['book_id'])
             ->where('status', 'borrowed')
@@ -43,7 +53,7 @@ class BorrowingController extends Controller
         }
 
         $now = Carbon::now();
-        $due = $now->copy()->addDays(7); // durasi peminjaman 7 hari
+        $due = $now->copy()->addDays(7);
 
         $borrowing = Borrowing::create([
             'user_id'     => Auth::id(),
@@ -56,7 +66,7 @@ class BorrowingController extends Controller
         return response()->json([
             'message'    => 'Buku berhasil dipinjam',
             'borrowing'  => $borrowing,
-        ], 200); 
+        ], 200);
     }
 
     // Proses pengembalian buku
@@ -73,6 +83,6 @@ class BorrowingController extends Controller
 
         return response()->json([
             'message' => 'Buku berhasil dikembalikan',
-        ], 200); 
+        ], 200);
     }
 }

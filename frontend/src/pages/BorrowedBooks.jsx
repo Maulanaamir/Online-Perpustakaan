@@ -1,20 +1,26 @@
+// src/pages/BorrowedBooks.jsx
 import React, { useEffect, useState } from "react";
 import axios from "../services/api";
 import BookCard from "../components/BookCard";
 
 export default function BorrowedBooks() {
   const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true); // Tambahkan indikator loading
+  const [loading, setLoading] = useState(true);
+
+  const fetchBorrowings = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get("/borrowings");
+      setBooks(res.data);
+    } catch (err) {
+      console.error("Gagal mengambil data peminjaman:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    axios.get("/borrowings")
-      .then((res) => {
-        setBooks(res.data);
-      })
-      .catch((err) => {
-        console.error("Gagal mengambil data peminjaman:", err);
-      })
-      .finally(() => setLoading(false));
+    fetchBorrowings();
   }, []);
 
   return (
@@ -28,7 +34,12 @@ export default function BorrowedBooks() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 justify-center">
           {books.map((b) => (
-            <BookCard key={b.id} book={b.book} />
+            <BookCard
+              key={b.id}
+              book={b.book}
+              borrowingId={b.id}
+              onReturned={fetchBorrowings}
+            />
           ))}
         </div>
       )}
