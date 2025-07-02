@@ -6,7 +6,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import BorrowedBooks from "../pages/BorrowedBooks";
 import AdminDashboard from "../pages/AdminDashboard";
-import Books from "../pages/admin/Books";
+import Books from "../pages/admin/BooksPage";
 import Categories from "../pages/admin/Categories";
 import Users from "../pages/admin/Users";
 
