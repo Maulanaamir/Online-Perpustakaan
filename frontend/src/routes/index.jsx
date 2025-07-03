@@ -7,8 +7,8 @@ import Register from "../pages/Register";
 import BorrowedBooks from "../pages/BorrowedBooks";
 import AdminDashboard from "../pages/AdminDashboard";
 import Books from "../pages/admin/BooksPage";
-import Categories from "../pages/admin/Categories";
-import Users from "../pages/admin/Users";
+import Categories from "../pages/admin/CategoriesPage.jsx";
+import Users from "../pages/admin/UsersPage.jsx";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import MainLayout from "../layouts/MainLayout";
